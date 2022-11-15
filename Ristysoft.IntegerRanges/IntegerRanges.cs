@@ -13,7 +13,7 @@ namespace Ristysoft
 
         public IntegerRanges(string ranges)
         {
-            AddFromString(ranges);
+            AddRange(ranges);
         }
 
         public IntegerRanges(IEnumerable<int> numbers)
@@ -29,7 +29,7 @@ namespace Ristysoft
         public static IntegerRanges Parse(string ranges)
         {
             IntegerRanges result = new IntegerRanges();
-            result.AddFromString(ranges);
+            result.AddRange(ranges);
             return result;
         }
 
@@ -69,7 +69,17 @@ namespace Ristysoft
             rootNode = removeFromNode(rootNode, from, to);
         }
 
-        public void AddFromString(string ranges)
+        public void AddRange(string ranges)
+        {
+            parseRange(ranges, (from, to) => AddRange(from, to));
+        }
+
+        public void RemoveRange(string ranges)
+        {
+            parseRange(ranges, (from, to) => RemoveRange(from, to));
+        }
+
+        static void parseRange(string ranges, Action<int, int> action)
         {
             if (string.IsNullOrEmpty(ranges)) return;
 
@@ -96,7 +106,7 @@ namespace Ristysoft
                             to = int.Parse(ranges.Substring(lastIndex, i - lastIndex));
                             lastIndex = i + 1;
                         }
-                        AddRange(from.Value, to ?? from.Value);
+                        action(from.Value, to ?? from.Value);
                         from = to = null;
                         break;
                     case ' ':
@@ -125,7 +135,7 @@ namespace Ristysoft
             {
                 to = int.Parse(ranges.Substring(lastIndex, ranges.Length - lastIndex));
             }
-            AddRange(from.Value, to ?? from.Value);
+            action(from.Value, to ?? from.Value);
         }
 
         public void AddArray(IEnumerable<int> numbers)
