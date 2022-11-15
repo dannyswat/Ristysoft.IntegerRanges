@@ -16,6 +16,11 @@ namespace Ristysoft
             AddFromString(ranges);
         }
 
+        public IntegerRanges(IEnumerable<int> numbers)
+        {
+            AddArray(numbers);
+        }
+
         public IntegerRanges(int from, int to)
         {
             AddRange(from, to);
@@ -50,6 +55,18 @@ namespace Ristysoft
             if (rootNode == null) { rootNode = new Node { From = from, To = to }; return; }
             addToNode(rootNode, from, to);
             intRanges = null; // remove cache
+        }
+
+        public void RemoveRange(int from)
+        {
+            RemoveRange(from, from);
+        }
+
+        public void RemoveRange(int from, int to)
+        {
+            if (rootNode == null) return;
+            intRanges = null;
+            rootNode = removeFromNode(rootNode, from, to);
         }
 
         public void AddFromString(string ranges)
@@ -182,6 +199,127 @@ namespace Ristysoft
                 transverse(node.Next, ranges);
         }
 
+        static void tryToAggregate(Node node)
+        {
+            if (node.Prev != null)
+            {
+                tryToAggregate(node.Prev);
+
+                if (node.Prev.To >= node.From - 1)
+                {
+                    if (node.Prev.From < node.From)
+                        node.From = node.Prev.From;
+                    node.Prev = null;
+                }
+            }
+
+            if (node.Next != null)
+            {
+                tryToAggregate(node.Next);
+                if (node.To >= node.Next.From - 1)
+                {
+                    if (node.Next.To > node.To)
+                        node.To = node.Next.To;
+                    node.Next = null;
+                }
+            }
+        }
+
+        Node removeFromNode(Node node, int from, int to)
+        {
+            if (from > node.To)
+            {
+                if (node.Next != null)
+                    node.Next = removeFromNode(node.Next, from, to);
+                return node;
+            }
+            else if (to < node.From)
+            {
+                if (node.Prev != null)
+                    node.Prev = removeFromNode(node.Prev, from, to);
+                return node;
+            }
+            if (from <= node.From && to >= node.To)
+            {
+                // Remove
+                if (node.Prev != null)
+                    node.Prev = removeFromNode(node.Prev, from, to);
+                if (node.Next != null)
+                    node.Next = removeFromNode(node.Next, from, to);
+
+                if (node.Prev != null)
+                {
+                    Node replaceNodeParent = findLargestParent(node.Prev);
+                    if (replaceNodeParent != null)
+                    {
+                        node.From = replaceNodeParent.Next.From;
+                        node.To = replaceNodeParent.Next.To;
+                        replaceNodeParent.Next = null;
+                    }
+                    else
+                    {
+                        node.From = node.Prev.From;
+                        node.To = node.Prev.To;
+                        node.Prev = node.Prev.Prev;
+                    }
+                }
+                else if (node.Next != null)
+                {
+                    Node replaceNodeParent = findSmallestParent(node.Next);
+                    if (replaceNodeParent != null)
+                    {
+                        node.From = replaceNodeParent.Prev.From;
+                        node.To = replaceNodeParent.Prev.To;
+                        replaceNodeParent.Prev = null;
+                    }
+                    else
+                    {
+                        node.From = node.Next.From;
+                        node.To = node.Next.To;
+                        node.Next = node.Next.Next;
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else if (from > node.From && to < node.To)
+            {
+                // Split
+                var next = node.Next;
+                node.Next = new Node { From = to + 1, To = node.To, Next = next };
+                node.To = from - 1;
+            }
+            else if (from <= node.From && to < node.To)
+            {
+                if (node.Prev != null)
+                    node.Prev = removeFromNode(node.Prev, from, to);
+                node.From = to + 1;
+            }
+            else if (to >= node.To && from > node.From)
+            {
+                if (node.Next != null)
+                    node.Next = removeFromNode(node.Next, from, to);
+                node.To = from - 1;
+            }
+            return node;
+        }
+
+        static Node findLargestParent(Node node)
+        {
+            if (node.Next != null)
+                return findLargestParent(node.Next) ?? node;
+            return null;
+        }
+
+        static Node findSmallestParent(Node node)
+        {
+            if (node.Prev != null)
+                return findSmallestParent(node.Prev) ?? node;
+            return null;
+        }
+
         static void addToNode(Node node, int from, int to)
         {
             if (from <= node.From - 1)
@@ -190,30 +328,15 @@ namespace Ristysoft
                 {
                     node.From = from;
                     node.To = to;
-                    if (node.Next != null && to >= node.Next.From - 1)
-                    {
-                        if (node.Next.To > node.To)
-                            node.To = node.Next.To;
-                        node.Next = null;
-                    }
-
-                    if (node.Prev != null && from >= node.Prev.To + 1)
-                    {
-                        if (node.Prev.From < node.From)
-                            node.From = node.Prev.From;
-                        node.Prev = null;
-                    }
+                    tryToAggregate(node);
 
                 }
                 else if (to >= node.From - 1)
                 {
                     if (from < node.From)
-                        node.From = from;
-                    if (node.Prev != null && from >= node.Prev.To + 1)
                     {
-                        if (node.Prev.From < node.From)
-                            node.From = node.Prev.From;
-                        node.Prev = null;
+                        node.From = from;
+                        tryToAggregate(node);
                     }
                 }
                 else
@@ -235,12 +358,9 @@ namespace Ristysoft
             else if (from <= node.To + 1)
             {
                 if (to > node.To)
-                    node.To = to;
-                if (node.Next != null && to >= node.Next.From - 1)
                 {
-                    if (node.Next.To > node.To)
-                        node.To = node.Next.To;
-                    node.Next = null;
+                    node.To = to;
+                    tryToAggregate(node);
                 }
             }
             else
