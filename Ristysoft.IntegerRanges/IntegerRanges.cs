@@ -170,7 +170,7 @@ namespace Ristysoft
                 throw new ArgumentException("There is no defined range.");
             if (intRanges != null) return;
             intRanges = new List<IntegerRange>();
-            transverse(rootNode, intRanges);
+            traverse(rootNode, intRanges);
         }
 
         public override string ToString()
@@ -188,15 +188,15 @@ namespace Ristysoft
             return false;
         }
 
-        static void transverse(Node node, List<IntegerRange> ranges)
+        static void traverse(Node node, List<IntegerRange> ranges)
         {
             if (node.Prev != null)
-                transverse(node.Prev, ranges);
+                traverse(node.Prev, ranges);
 
             ranges.Add(new IntegerRange(node.From, node.To));
 
             if (node.Next != null)
-                transverse(node.Next, ranges);
+                traverse(node.Next, ranges);
         }
 
         static void tryToAggregate(Node node)
