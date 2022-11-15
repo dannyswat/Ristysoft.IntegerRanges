@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ristysoft.IntegerRanges", "Ristysoft.IntegerRanges\Ristysoft.IntegerRanges.csproj", "{C988DA61-09F4-40D1-804E-8B16D681FFE3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ristysoft.UnitTest", "Ristysoft.UnitTest\Ristysoft.UnitTest.csproj", "{299DF1D2-C475-4E5D-A3EE-52CE3DCACE8E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C988DA61-09F4-40D1-804E-8B16D681FFE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C988DA61-09F4-40D1-804E-8B16D681FFE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C988DA61-09F4-40D1-804E-8B16D681FFE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C988DA61-09F4-40D1-804E-8B16D681FFE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{299DF1D2-C475-4E5D-A3EE-52CE3DCACE8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{299DF1D2-C475-4E5D-A3EE-52CE3DCACE8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{299DF1D2-C475-4E5D-A3EE-52CE3DCACE8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{299DF1D2-C475-4E5D-A3EE-52CE3DCACE8E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EB1EC94C-197D-4FD9-80E6-6CF40BE7C529}
+	EndGlobalSection
+EndGlobal
